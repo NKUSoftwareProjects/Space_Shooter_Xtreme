@@ -3,11 +3,10 @@
 # @Author: tasdik
 # @Contributers : Branden (Github: @bardlean86)
 # @Date:   2016-01-17
-# @Email:  prodicus@outlook.com  Github: @tasdikrahman
+# @Email:  prodicus@outlook.com  Github: @prodicus
 # @Last Modified by:   tasdik
 # @Last Modified by:   Branden
-# @Last Modified by:   Dic3
-# @Last Modified time: 2016-10-16
+# @Last Modified time: 2016-01-21
 # MIT License. You can find a copy of the License @ http://prodicus.mit-license.org
 
 ## Game music Attribution
@@ -30,8 +29,6 @@ WIDTH = 480
 HEIGHT = 600
 FPS = 60
 POWERUP_TIME = 5000
-BAR_LENGTH = 100
-BAR_HEIGHT = 10
 
 # Define Colors 
 WHITE = (255, 255, 255)
@@ -42,6 +39,8 @@ BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 ###############################
 
+
+
 ###############################
 ## to placed in "__init__.py" later
 ## initialize pygame and create window
@@ -51,7 +50,15 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Space Shooter")
 clock = pygame.time.Clock()     ## For syncing the FPS
 ###############################
+#create highscore file
 
+
+
+
+
+
+
+###################################
 font_name = pygame.font.match_font('arial')
 
 def main_menu():
@@ -62,6 +69,9 @@ def main_menu():
 
     title = pygame.image.load(path.join(img_dir, "main.png")).convert()
     title = pygame.transform.scale(title, (WIDTH, HEIGHT), screen)
+    
+    
+    
 
     screen.blit(title, (0,0))
     pygame.display.update()
@@ -74,10 +84,14 @@ def main_menu():
             elif ev.key == pygame.K_q:
                 pygame.quit()
                 quit()
-        elif ev.type == pygame.QUIT:
-                pygame.quit()
-                quit() 
         else:
+
+            text_file = open("high_scores.txt", "r")
+            whole_thing = text_file.read()
+            draw_text(screen, "High_score :" + whole_thing , 50, WIDTH/2, (HEIGHT/2) + 100 )
+            text_file.close()
+            
+            
             draw_text(screen, "Press [ENTER] To Begin", 30, WIDTH/2, HEIGHT/2)
             draw_text(screen, "or [Q] To Quit", 30, WIDTH/2, (HEIGHT/2)+40)
             pygame.display.update()
@@ -85,11 +99,11 @@ def main_menu():
     #pygame.mixer.music.stop()
     ready = pygame.mixer.Sound(path.join(sound_folder,'getready.ogg'))
     ready.play()
-    screen.fill(BLACK)
+    screen.fill((0,0,0))
     draw_text(screen, "GET READY!", 40, WIDTH/2, HEIGHT/2)
     pygame.display.update()
     
-
+    
 def draw_text(surf, text, size, x, y):
     ## selecting a cross platform font to display the score
     font = pygame.font.Font(font_name, size)
@@ -100,12 +114,10 @@ def draw_text(surf, text, size, x, y):
 
 
 def draw_shield_bar(surf, x, y, pct):
-    # if pct < 0:
-    #     pct = 0
-    pct = max(pct, 0) 
-    ## moving them to top
-    # BAR_LENGTH = 100
-    # BAR_HEIGHT = 10
+    if pct < 0:
+        pct = 0 
+    BAR_LENGTH = 100
+    BAR_HEIGHT = 10
     fill = (pct / 100) * BAR_LENGTH
     outline_rect = pygame.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
     fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
@@ -426,6 +438,26 @@ pygame.mixer.music.set_volume(0.2)      ## simmered the sound down a little
 player_die_sound = pygame.mixer.Sound(path.join(sound_folder, 'rumble1.ogg'))
 ###################################################
 
+## group all the sprites together for ease of update
+all_sprites = pygame.sprite.Group()
+player = Player()
+all_sprites.add(player)
+
+## spawn a group of mob
+mobs = pygame.sprite.Group()
+for i in range(8):      ## 8 mobs
+    # mob_element = Mob()
+    # all_sprites.add(mob_element)
+    # mobs.add(mob_element)
+    newmob()
+
+## group for bullets
+bullets = pygame.sprite.Group()
+powerups = pygame.sprite.Group()
+
+#### Score board variable
+score = 0
+
 ## TODO: make the game music loop over again and again. play(loops=-1) is not working
 # Error : 
 # TypeError: play() takes no keyword arguments
@@ -447,26 +479,6 @@ while running:
         pygame.mixer.music.play(-1)     ## makes the gameplay sound in an endless loop
         
         menu_display = False
-        
-        ## group all the sprites together for ease of update
-        all_sprites = pygame.sprite.Group()
-        player = Player()
-        all_sprites.add(player)
-
-        ## spawn a group of mob
-        mobs = pygame.sprite.Group()
-        for i in range(8):      ## 8 mobs
-            # mob_element = Mob()
-            # all_sprites.add(mob_element)
-            # mobs.add(mob_element)
-            newmob()
-
-        ## group for bullets
-        bullets = pygame.sprite.Group()
-        powerups = pygame.sprite.Group()
-
-        #### Score board variable
-        score = 0
         
     #1 Process input/events
     clock.tick(FPS)     ## will make the loop run at the same speed all the time
@@ -521,11 +533,14 @@ while running:
             player_die_sound.play()
             death_explosion = Explosion(player.rect.center, 'player')
             all_sprites.add(death_explosion)
+     
+            
             # running = False     ## GAME OVER 3:D
             player.hide()
             player.lives -= 1
             player.shield = 100
-
+        
+            
     ## if the player hit a power up
     hits = pygame.sprite.spritecollide(player, powerups, True)
     for hit in hits:
@@ -539,9 +554,22 @@ while running:
     ## if player died and the explosion has finished, end game
     if player.lives == 0 and not death_explosion.alive():
         running = False
+          ## write high score
+        with open("high_scores.txt", "r") as f:
+            data = f.read()
+            
+            if data == '':
+                data = 0;
+            data1 = int(data);
+            f.close()
+            if(data1 < score):
+                with open("high_scores.txt", "w") as f:       
+                    f.write(str(score))
+            f.close()
+        
         # menu_display = True
         # pygame.display.update()
-
+        
     #3 Draw/render
     screen.fill(BLACK)
     ## draw the stargaze.png image
