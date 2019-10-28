@@ -121,20 +121,6 @@ def draw_lives(surf, x, y, lives, img):
         img_rect.y = y
         surf.blit(img, img_rect)
 
-def draw_bulletstatus(surf, x, y, bulletstatus, img):
-    for i in range(bulletstatus):
-        img_rect= img.get_rect()
-        img_rect.x = x + 30 * i
-        img_rect.y = y
-        surf.blit(img, img_rect)
-        
-def draw_missiletatus(surf, x, y, missilestatus, img):
-    for i in range(missilestatus):
-        img_rect= img.get_rect()
-        img_rect.x = x + 30 * i
-        img_rect.y = y
-        surf.blit(img, img_rect)
-
 ## changed/added alien
 def newalien():
     alien = Alien()
@@ -163,9 +149,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.bottom = HEIGHT - 10
         self.speedx = 0
         self.speedy = 0
+        self.direction = -10
         self.shield = 100
-        self.bulletstatus = 1
-        self.missilestatus = 1
         self.shoot_delay = 250
         self.last_shot = pygame.time.get_ticks()
         self.lives = 3
@@ -225,14 +210,14 @@ class Player(pygame.sprite.Sprite):
         if now - self.last_shot > self.shoot_delay:
             self.last_shot = now
             if self.power == 1:
-                bullet = Bullet(self.rect.centerx, self.rect.top)
+                bullet = Bullet(self.rect.centerx, self.rect.top, self.direction)
                 all_sprites.add(bullet)
                 bullets.add(bullet)
                 shooting_sound.play()
 
             if self.power == 2:
-                bullet1 = Bullet(self.rect.left, self.rect.centery)
-                bullet2 = Bullet(self.rect.right, self.rect.centery)
+                bullet1 = Bullet(self.rect.left, self.rect.centery, self.direction)
+                bullet2 = Bullet(self.rect.right, self.rect.centery, self.direction)
                 all_sprites.add(bullet1)
                 all_sprites.add(bullet2)
                 bullets.add(bullet1)
@@ -240,9 +225,9 @@ class Player(pygame.sprite.Sprite):
                 shooting_sound.play()
 
             if self.power == 3:
-                bullet1 = Bullet(self.rect.left, self.rect.centery) # bullet shoots from left of ship
-                bullet2 = Bullet(self.rect.right, self.rect.centery)# bullet shoots from right of ship
-                bullet3 = Bullet(self.rect.centerx, self.rect.top) # bullet shoots from center of ship
+                bullet1 = Bullet(self.rect.left, self.rect.centery, self.direction) # bullet shoots from left of ship
+                bullet2 = Bullet(self.rect.right, self.rect.centery, self.direction)# bullet shoots from right of ship
+                bullet3 = Bullet(self.rect.centerx, self.rect.top, self.direction) # bullet shoots from center of ship
                 all_sprites.add(bullet1)
                 all_sprites.add(bullet2)
                 all_sprites.add(bullet3)
@@ -252,8 +237,8 @@ class Player(pygame.sprite.Sprite):
                 shooting_sound.play()
 
             if self.power == 4:
-                bullet1 = Bullet(self.rect.left, self.rect.centery) # Bullet shoots from left of ship
-                bullet2 = Bullet(self.rect.right, self.rect.centery)# Bullet shoots from right of ship
+                bullet1 = Bullet(self.rect.left, self.rect.centery, self.direction) # Bullet shoots from left of ship
+                bullet2 = Bullet(self.rect.right, self.rect.centery, self.direction)# Bullet shoots from right of ship
                 bullet3 = Missile(self.rect.centerx, self.rect.top) # Missile shoots from center of ship
                 all_sprites.add(bullet1)
                 all_sprites.add(bullet2)
@@ -297,6 +282,7 @@ class Pow(pygame.sprite.Sprite):
         ## place the bullet according to the current position of the player
         self.rect.center = center
         self.speedy = 2
+        ##self.direction = -10
 
     def update(self):
         """should spawn right in front of the player"""
@@ -334,14 +320,10 @@ background_rect = background.get_rect()
 ## ^^ draw this rect first
 
 player_img = pygame.image.load(path.join(img_dir, 'playerShip1_orange.png')).convert()
-bullet_img = pygame.image.load(path.join(img_dir, 'laserRed16.png')).convert()
-missile_img = pygame.image.load(path.join(img_dir, 'missile.png')).convert_alpha()
 player_mini_img = pygame.transform.scale(player_img, (25, 19))
 player_mini_img.set_colorkey(BLACK)
-bullet_mini_img = pygame.transform.scale(bullet_img, (10, 19))
-bullet_mini_img.set_colorkey(BLACK)
-missile_mini_img = pygame.transform.scale(missile_img, (12, 19))
-missile_mini_img.set_colorkey(BLACK)
+bullet_img = pygame.image.load(path.join(img_dir, 'laserRed16.png')).convert()
+missile_img = pygame.image.load(path.join(img_dir, 'missile.png')).convert_alpha()
 
 ## load power ups
 powerup_images = {}
@@ -529,7 +511,7 @@ while running:
 
     #3 Draw/render
     screen.fill(BLACK)
-     ## draw the stargaze.png image
+    ## draw the stargaze.png image
     screen.blit(background, background_rect)
 
     all_sprites.draw(screen)
@@ -538,8 +520,6 @@ while running:
 
     # Draw lives
     draw_lives(screen, WIDTH - 100, 5, player.lives, player_mini_img)
-    draw_bulletstatus(screen, WIDTH - 90, 35, player.bulletstatus, bullet_mini_img)
-    draw_missiletatus(screen, WIDTH - 40, 35, player.missilestatus, missile_mini_img)
 
     ## Done after drawing everything to the screen
     pygame.display.flip()
@@ -556,10 +536,12 @@ while running:
                     break
                 elif ev.key == pygame.K_q:
                     pygame.quit()
-                    quit()
+                    #quit()
+                    break
             elif ev.type == pygame.QUIT:
                  pygame.quit()
-                 quit()
+                 #quit()
+                 break
             else:
                  draw_text(screen, "Press [ENTER] to Replay", 30, WIDTH/2, HEIGHT/2)
                  draw_text(screen, "or [Q] to Quit", 30, WIDTH/2, (HEIGHT/2)+40)
@@ -572,13 +554,8 @@ while running:
                 if ev.key == pygame.K_RETURN:
                     pause = False
                     break
-                elif ev.key == pygame.K_ESCAPE:
-                    running = False
-                    pygame.quit()
-                    
             else:
                 draw_text(screen, "Game Paused...", 30, WIDTH/2, HEIGHT/2)
                 draw_text(screen, "Press [ENTER] to resume game", 30, WIDTH/2, (HEIGHT/2)+40)
-                draw_text(screen, "or [ESC] to exit game", 30, WIDTH/2, (HEIGHT/2)+80)
                 pygame.display.update()
 pygame.quit()
