@@ -2,6 +2,8 @@
 
 import pygame
 
+import random
+from constant import *
 from mob_class import Mob
 
 #-------- This is the method I wanted to test, but trying to import it just launches the game..... so I brought it here for proof of concept.

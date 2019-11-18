@@ -16,19 +16,19 @@ def extralife():
             offset += 1
 
 #----------- Start white box testing
-with open("spaceshooter/evan_whitebox_suite.txt", "r") as input_file:
+with open("spaceshooter/Evan_Tests/Extra_Life/evan_whitebox_suite.txt", "r") as input_file:
     tests = input_file.readlines()
 
 # you may also want to remove whitespace characters like `\n` at the end of each line
 tests = [x.strip() for x in tests]
 
-with open("spaceshooter/evan_whitebox_expected.txt", "r") as expected_file:
+with open("spaceshooter/Evan_Tests/Extra_Life/evan_whitebox_expected.txt", "r") as expected_file:
     expected = expected_file.readlines()
 
 # you may also want to remove whitespace characters like `\n` at the end of each line
 expected = [x.strip() for x in expected]
 
-with open("spaceshooter/evan_whitebox_suite_output.txt", "w+") as output:
+with open("spaceshooter/Evan_Tests/Extra_Life/evan_whitebox_suite_output.txt", "w+") as output:
     for x in range(len(tests)):
         score = int(tests[x])
         extralife()
