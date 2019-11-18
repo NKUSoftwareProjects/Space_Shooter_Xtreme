@@ -1,0 +1,6 @@
+Tested: 100  in newmob(). Result: 2    -Passed
+Tested: 50   in newmob(). Result: 1    -Passed
+Tested: 0    in newmob(). Result: 1    -Passed
+Tested: 1    in newmob(). Result: 1    -Passed
+Tested: 34   in newmob(). Result: 1    -Passed
+Tested: 105  in newmob(). Result: 1    -Passed

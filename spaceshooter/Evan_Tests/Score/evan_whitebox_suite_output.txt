@@ -1,0 +1,54 @@
+Test 0 PASSED ---------------------
+Given radius: 6
+gotScore is: 50
+Score is: 50
+This matched the expected value: 50:50
+
+Test 1 PASSED ---------------------
+Given radius: 9
+gotScore is: 50
+Score is: 100
+This matched the expected value: 50:100
+
+Test 2 PASSED ---------------------
+Given radius: 10
+gotScore is: 500
+Score is: 600
+This matched the expected value: 500:600
+
+Test 3 PASSED ---------------------
+Given radius: 11
+gotScore is: 40
+Score is: 640
+This matched the expected value: 40:640
+
+Test 4 PASSED ---------------------
+Given radius: 14
+gotScore is: 40
+Score is: 680
+This matched the expected value: 40:680
+
+Test 5 PASSED ---------------------
+Given radius: 29
+gotScore is: 30
+Score is: 710
+This matched the expected value: 30:710
+
+Test 6 PASSED ---------------------
+Given radius: 49
+gotScore is: 20
+Score is: 730
+This matched the expected value: 20:730
+
+Test 7 PASSED ---------------------
+Given radius: 54
+gotScore is: 10
+Score is: 740
+This matched the expected value: 10:740
+
+Test 8 PASSED ---------------------
+Given radius: 56
+gotScore is: 5
+Score is: 745
+This matched the expected value: 5:745
+
